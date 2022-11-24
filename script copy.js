@@ -16,6 +16,7 @@ const cargarCamera = () => {
     )
 }
 
+let labeledFaceDesciptor;
 Promise.all([
     faceapi.nets.ssdMobilenetv1.loadFromUri('/models'),
     //faceapi.nets.ageGenderNet.loadFromUri('/models'),
@@ -24,10 +25,13 @@ Promise.all([
     //faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
     //faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-]).then(cargarCamera)
+]).then(async () => {
+    labeledFaceDesciptor = await loadLabeledImages();
+}
+).then(cargarCamera)
 
 elVideo.addEventListener('play', async () => {
-    const labeledFaceDesciptor = await loadLabeledImages();
+    //const labeledFaceDesciptor = await loadLabeledImages();
     const faceMatcher = new faceapi.FaceMatcher(labeledFaceDesciptor, 0.6)
 
     const canvas = faceapi.createCanvasFromMedia(elVideo)
@@ -42,12 +46,12 @@ elVideo.addEventListener('play', async () => {
     setInterval(async () => {
         const detections = await faceapi.detectAllFaces(elVideo).withFaceLandmarks().withFaceDescriptors()
         const resizedDetections = faceapi.resizeResults(detections, displaySize)
-        const results = resizedDetections.map( (d) => faceMatcher.findBestMatch(d.descriptor))
-        
-        results.forEach( (result, i) => {
-            if(result.label != "unknown"){
+        const results = resizedDetections.map((d) => faceMatcher.findBestMatch(d.descriptor))
+
+        results.forEach((result, i) => {
+            if (result.label != "unknown") {
                 const box = resizedDetections[i].detection.box
-                const drawBox = new faceapi.draw.DrawBox(box, {label: result.toString()})
+                const drawBox = new faceapi.draw.DrawBox(box, { label: result.toString() })
                 canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
                 drawBox.draw(canvas)
             } else {
@@ -61,18 +65,18 @@ async function loadLabeledImages() {
     console.log(new Date());
     const labels = ['Santiago Galvez', 'Candelaria de Goycoechea', 'Chris Hemsworth', 'Robert Downey jr', 'Cris Evans']
     return Promise.all(
-      labels.map(async label => {
-        const descriptions = []
-        for (let i = 1; i <= 2; i++) {
-          //const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/WebDevSimplified/Face-Recognition-JavaScript/master/labeled_images/${label}/${i}.jpg`)
-          //const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/SantiagoGalvez00/Reconocimiento-facial/master/images/${label}/${i}.png`)
-          const img = await faceapi.fetchImage(`images/${label}/${i}.png`)
-          const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
-          descriptions.push(detections.descriptor)
-        }
-        console.log(new Date());
-  
-        return new faceapi.LabeledFaceDescriptors(label, descriptions)
-      })
+        labels.map(async label => {
+            const descriptions = []
+            for (let i = 1; i <= 2; i++) {
+                //const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/WebDevSimplified/Face-Recognition-JavaScript/master/labeled_images/${label}/${i}.jpg`)
+                //const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/SantiagoGalvez00/Reconocimiento-facial/master/images/${label}/${i}.png`)
+                const img = await faceapi.fetchImage(`images/${label}/${i}.png`)
+                const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
+                descriptions.push(detections.descriptor)
+            }
+            console.log(new Date());
+
+            return new faceapi.LabeledFaceDescriptors(label, descriptions)
+        })
     )
-  }
+}
