@@ -58,16 +58,19 @@ elVideo.addEventListener('play', async () => {
 })
 
 async function loadLabeledImages() {
-    const labels = ['Santiago Galvez', 'Candelaria de Goycoechea']
+    console.log(new Date());
+    const labels = ['Santiago Galvez', 'Candelaria de Goycoechea', 'Chris Hemsworth', 'Robert Downey jr', 'Cris Evans']
     return Promise.all(
       labels.map(async label => {
         const descriptions = []
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 1; i <= 2; i++) {
           //const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/WebDevSimplified/Face-Recognition-JavaScript/master/labeled_images/${label}/${i}.jpg`)
+          //const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/SantiagoGalvez00/Reconocimiento-facial/master/images/${label}/${i}.png`)
           const img = await faceapi.fetchImage(`images/${label}/${i}.png`)
           const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
           descriptions.push(detections.descriptor)
         }
+        console.log(new Date());
   
         return new faceapi.LabeledFaceDescriptors(label, descriptions)
       })
