@@ -17,6 +17,9 @@ const cargarCamera = () => {
 }
 
 let labeledFaceDesciptor;
+let confirmFace;
+let count = 0;
+
 Promise.all([
     faceapi.nets.ssdMobilenetv1.loadFromUri('/models'),
     //faceapi.nets.ageGenderNet.loadFromUri('/models'),
@@ -50,6 +53,19 @@ elVideo.addEventListener('play', async () => {
 
         results.forEach((result, i) => {
             if (result.label != "unknown") {
+                if(confirmFace == result.label){
+                    count += 1;
+                } else {
+                    confirmFace = result.label;
+                    count = 0;
+                }
+
+                if(count > 10){
+                    console.log({
+                        result: result.label,
+                        count
+                    });
+                }
                 const box = resizedDetections[i].detection.box
                 const drawBox = new faceapi.draw.DrawBox(box, { label: result.toString() })
                 canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
