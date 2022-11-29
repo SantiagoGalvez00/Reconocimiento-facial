@@ -63,7 +63,7 @@ elVideo.addEventListener('play', async () => {
 
 async function loadLabeledImages() {
     console.log(new Date());
-    const labels = ['Santiago Galvez', 'Candelaria de Goycoechea', 'Chris Hemsworth', 'Robert Downey jr', 'Cris Evans']
+    const labels = ['Santiago Galvez', 'Candelaria de Goycoechea', 'Chris Hemsworth', 'Robert Downey jr','Cris Evans']
     return Promise.all(
         labels.map(async label => {
             const descriptions = []
