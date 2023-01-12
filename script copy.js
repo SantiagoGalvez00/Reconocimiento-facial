@@ -28,10 +28,8 @@ Promise.all([
     //faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
     //faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-]).then(async () => {
-    labeledFaceDesciptor = await loadLabeledImages();
-}
-).then(cargarCamera)
+]).then(async () => labeledFaceDesciptor = await loadLabeledImages())
+.then(cargarCamera)
 
 elVideo.addEventListener('play', async () => {
     //const labeledFaceDesciptor = await loadLabeledImages();
@@ -50,7 +48,6 @@ elVideo.addEventListener('play', async () => {
         const detections = await faceapi.detectAllFaces(elVideo).withFaceLandmarks().withFaceDescriptors()
         const resizedDetections = faceapi.resizeResults(detections, displaySize)
         const results = resizedDetections.map((d) => faceMatcher.findBestMatch(d.descriptor))
-
         results.forEach((result, i) => {
             if (result.label != "unknown") {
                 if(confirmFace == result.label){
@@ -71,6 +68,7 @@ elVideo.addEventListener('play', async () => {
                 canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
                 drawBox.draw(canvas)
             } else {
+                count = 0;
                 canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
             }
         });
@@ -78,7 +76,7 @@ elVideo.addEventListener('play', async () => {
 })
 
 async function loadLabeledImages() {
-    console.log(new Date());
+    console.log("Start loading labels...");
     const labels = ['Santiago Galvez', 'Candelaria de Goycoechea', 'Chris Hemsworth', 'Robert Downey jr','Cris Evans']
     return Promise.all(
         labels.map(async label => {
@@ -90,7 +88,6 @@ async function loadLabeledImages() {
                 const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
                 descriptions.push(detections.descriptor)
             }
-            console.log(new Date());
 
             return new faceapi.LabeledFaceDescriptors(label, descriptions)
         })
